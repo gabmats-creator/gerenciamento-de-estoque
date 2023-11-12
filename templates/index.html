@@ -1,0 +1,71 @@
+{% from "macros/fields.html" import render_text_field %}
+
+{% extends "layout.html" %}
+
+{% block head_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+{% endblock %}
+
+{% block main_content %}
+    <h1>Olá, {{ user_name }}</h1>
+    
+    <h1>Produtos recentes</h1>
+    {% if product_data %}
+        <table class="table">
+            <colgroup>
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+            </colgroup>
+            
+            <thead>
+                <th class="table__cell table__cell--header">Nome do Produto</th>
+                <th class="table__cell table__cell--header">Valor</th>
+                <th class="table__cell table__cell--header">Data de emissão</th>
+                <th class="table__cell table__cell--header">Descrição</th>
+                <th class="table__cell table__cell--header">Funcionário responsável</th>
+                <th class="table__cell table__cell--header"></th>
+            </thead>
+            <tbody>
+                {% for product in product_data %}
+                    <tr>
+                        <td class="table__cell">
+                            <p class="table__element">{{ product.productName }}</p>
+                        </td>
+                        <td class="table__cell">
+                            <p class="table__element">{{ product.productValue }}</p>
+                        </td>
+                        <td class="table__cell">
+                            <p class="table__element">{{ product.emmitDate }}</p>
+                        </td>
+                        <td class="table__cell">
+                            <p class="table__element">{{ product.description }}</p>
+                        </td>
+                        <td class="table__cell">
+                            <p class="table__element">{{ product.employee_name }}</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="table__empty">Não há produtos recentes a exibir, <a class="table__link" href="{{ url_for('add_product') }}" >adicione um novo produto</a> para poder visualizá-lo</p>
+    {% endif %}
+    <a
+        href="{{ url_for('add_product') }}" 
+        class="nav__link"
+    >
+        <span class="nav__item">Adicionar novo produto</span>
+    </a>
+    <a
+        href="{{ url_for('products') }}" 
+        class="nav__link"
+    >
+        <span class="nav__item">Todos os produtos</span>
+    </a>
+
+{% endblock %}
+

@@ -1,0 +1,154 @@
+.table {
+    max-width: 50rem;
+    width: 100%;
+    margin: 0 auto;
+    border-spacing: 0;
+}
+
+.table__cell {
+    padding: 1.25rem 1rem;
+}
+
+.table__cell--header {
+    text-align: center;
+    padding: 0.5rem 1rem;
+    border-bottom: var(--border);
+}
+
+.table__element {
+    font-weight: 600;
+}
+
+.table__link {
+    color: var(--accent-colour-2);
+    text-decoration: none;
+}
+
+.table__link:hover {
+    color: var(--accent-colour);
+    text-decoration: underline;
+    text-decoration-color: var(--accent-colour);
+}
+
+.table__empty {
+    display: block;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.product__edit {
+    display: flex;
+    text-decoration: none;
+    align-items: center;
+    margin-left: 1rem;
+    color: inherit;
+}
+
+.product__edit:hover {
+    text-decoration: underline;
+    color: var(--item-colour);
+}
+
+.pencil {
+    width: 2em;
+    height: 3em;
+    margin-left: 3px;
+}
+
+.product__delete {
+    display: flex;
+    text-decoration: none;
+    align-items: center;
+    margin-left: 1rem;
+    color: inherit;
+}
+
+.product__delete:hover {
+    text-decoration: underline;
+    color: var(--item-colour);
+}
+
+.button--add {
+    position: absolute;
+    bottom: 4rem;
+    right: 2rem;
+    display: flex;
+    height: 5rem;
+    width: 5rem;
+    border: var(--border);
+    border-radius: 50%;
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.75rem;
+    align-items: center;
+    justify-content: center;
+}
+
+@media screen and (min-width: 50em) {
+    .button--add {
+        right: 3rem;
+    }
+}
+
+@media screen and (min-width: 80em) {
+    .button--add {
+        right: 4rem;
+    }
+}
+
+.button--add:hover {
+    color: var(--text);
+    background-color: var(--item-colour);
+}
+
+.overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+}
+
+/* Estilo para o conteúdo do popup */
+.popup {
+    display: block;
+    position: fixed;
+    background-color: #fff;
+    border: 1px solid #333;
+    border-radius: 5px;
+    z-index: 1000;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+}
+
+form {
+    margin: 0 auto;
+    max-width: 30rem;
+    border: var(--border);
+    font-size: 1.2rem;
+
+    background: var(--background-color);
+    box-shadow: 0.75rem 0.75rem 0 -0.2rem goldenrod;
+}
+
+.pop {
+    padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+}
+
+@media screen and (min-width: 24.75em) {
+    .popup {
+        padding-left: 2rem;
+    }
+}
+
+@media screen and (min-width: 30em) {
+    .popup {
+        padding-left: 2.5rem;
+    }
+}

@@ -1,0 +1,49 @@
+{% from "macros/svgs.html" import moon, sun %}
+
+{% macro header(email, theme) %}
+<header class="header"> 
+    <div class="nav-container">
+        <a href="{{ url_for('index' )}}" class="header__logo">
+            <span class="logo__name">Stock Control</span>
+        </a>
+        <nav class="nav">
+            {% if not email %}
+                <a 
+                    href="{{ url_for('login') }}" 
+                    class="nav__link"
+                >
+                    <span class="nav__item">Log in</span>
+                </a>
+                <a 
+                    href="{{ url_for('register') }}"
+                    class="nav__link"
+                >
+                    <span class="nav__item">Registrar</span>
+                </a>
+            {% else %}
+                <a
+                    href="{{ url_for('index') }}" 
+                    class="nav__link"
+                >
+                    <span class="nav__item">Início</span>
+                </a>
+                <a 
+                    href="{{ url_for('logout') }}"
+                    class="nav__link"
+                >
+                    <span class="nav__item">Sair</span>
+                </a>
+            {% endif %}
+            <a href="{{ url_for('toggle_theme', current_page=request.path) }}" class="nav__link">
+                <span class="nav__item">
+                    {% if theme == "dark" %}
+                        {{ sun("nav__icon") }}
+                    {% else %}
+                        {{ moon("nav__icon") }}
+                    {% endif %}
+                </span>
+            </a>
+        </nav>
+    </div>
+</header>
+{% endmacro %}
