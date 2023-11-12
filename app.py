@@ -124,7 +124,6 @@ def create_app():
     def add_enterprise():
         user_id = request.args.get('user_id')
         cnpj = request.args.get('cnpj')
-        print("chegou aqui")
         form = EnterpriseForm()
         if form.validate_on_submit():
             enterprise = Enterprise(
@@ -142,7 +141,6 @@ def create_app():
 
             flash("Usuário registrado com sucesso!")
             return redirect(url_for(".login"))
-        print("caiu aqui")
         return render_template("new_enterprise.html", title="Stock Control - Adicionar Empresa", form=form)
     
     @app.route("/conta/<string:_id>", methods=["GET", "POST"])
