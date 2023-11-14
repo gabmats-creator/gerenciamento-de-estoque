@@ -7,7 +7,12 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>Completar cadastro</h1>
+    {% if message %}
+        <h1>Ops, percebemos que você não está vinculado a nenhuma empresa cadastrada, realize o cadastro de sua empresa para prosseguir com seu acesso.</h1>
+    {% else %}
+        <h1>Completar cadastro</h1>
+    {% endif %}
+    
     <p>Para completar seu cadastro, precisamos de mais algumas informações sobre sua empresa</p>
     <form name="add_enterprise" method="post" novalidate class="form">
         <div class="form__container">

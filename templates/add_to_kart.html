@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block main_content %}
-    <h1>Produtos disponíveis</h1>
+    <h1>Produtos disponíveis para adicionar no carrinho</h1>
     {% if product_data %}
         <table class="table">
             <colgroup>
@@ -22,10 +22,10 @@
             <thead>
                 <th class="table__cell table__cell--header">Nome da Conta</th>
                 <th class="table__cell table__cell--header">Valor</th>
-                <th class="table__cell table__cell--header">Inserido em</th>
+                <th class="table__cell table__cell--header">Data de vencimento</th>
                 <th class="table__cell table__cell--header">Descrição</th>
-                <th class="table__cell table__cell--header">Quantidade</th>
                 <th class="table__cell table__cell--header">Funcionário responsável</th>
+                <th class="table__cell table__cell--header"></th>
                 <th class="table__cell table__cell--header"></th>
                 <th class="table__cell table__cell--header"></th>
                 <th class="table__cell table__cell--header"></th>
@@ -37,21 +37,12 @@
                             <p class="table__productname">{{ product.productName }}</p>
                         </td>
                         <td class="table__cell">{{ product.productValue }}</td>
-                        <td class="table__cell">{{ product.insertDate }}</td>
+                        <td class="table__cell">{{ product.productDate }}</td>
                         <td class="table__cell">{{ product.description}}</td>
-                        <td class="table__cell">{{ product.quantidadeTotal}}</td>
-                        <td class="table__cell">{{ product.employee_name}}</td>
+                        <td class="table__cell"><a class="product__edit" href="{{ url_for('edit_product', _id=product._id) }}">{{ pencil("pencil") }}</a></td>
+                        
                         <td class="table__cell">
-                            <a href="{{ url_for('edit_product', _id=product._id) }}" class="table__link" id="mostrarPopup">Editar</a>
-                        </td>
-                        <td class="table__cell">
-                            <a href="{{ url_for('delete_product', _id=product._id) }}" class="table__link" id="mostrarPopup">Excluir</a>
-                        </td>
-                        <td class="table__cell">
-                            <a href="{{ url_for('confirm_kart', _id=product._id) }}" class="table__link" id="mostrarPopup">Adicionar ao carrinho</a>
-                        </td>
-                        <td class="table__cell">
-                            <a href="{{ url_for('sale', _id=product._id) }}" class="table__link" id="mostrarPopup">Vender</a>
+                            <a href="{{ url_for('add_product', _id=product._id) }}" class="table__link" id="mostrarPopup">Adicionar ao carrinho</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -114,48 +105,6 @@
             </form>
         </div>
     
-    {% endif %}
-
-    {% if confirm_kart %}
-    <div class="overlay" id="overlay">
-    </div>
-
-    <div class="popup" id="popup">
-        {% if erro %}
-            <p style="color: red;">{{ erro }}</p>
-        {% endif %}
-        <p>Quantidade já adicionada no carrinho: {{ qtdeCarrinho }}</p>
-        <p>Quantidade disponível para adicionar: {{ qtdeDispo }}</p>
-        <h2>Deseja adicionar este produto ao carrinho?</h2>
-        <form method="POST">
-            <label for="amount">Quantidade</label>
-            <input id="amount" type="number" name="amount" placeholder="Quantidade">
-
-            <input type="hidden" name="operacao" value="confirmar">
-            <button type="submit">Confirmar</button>
-            
-            <input type="hidden" name="operacao" value="cancelar">
-            <button type="submit">Cancelar</button>
-        </form>
-    </div>
-    {% endif %}
-
-    {% if sale_kart %}
-        <div class="overlay" id="overlay"></div>
-        </div>
-
-        <div class="popup" id="popup">
-            <h2>Deseja realizar a venda deste produto?</h2>
-            <p>Esta ação é definitiva</p>
-            <form method="POST">
-                <input type="hidden" name="operacao" value="confirmar">
-                <button type="submit">Confirmar</button>
-            </form>
-            <form method="POST">
-                <input type="hidden" name="operacao" value="cancelar">
-                <button type="submit">Cancelar</button>
-            </form>
-        </div>
     {% endif %}
 
 {% endblock %}

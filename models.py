@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import List, Tuple
 
 @dataclass
 class Product:
@@ -11,7 +12,9 @@ class Product:
     insertDate: str
     employee_name: str
     employee_id: str
-    quantidade: int
+    carrinho: bool
+    quantidadeTotal: int
+    quantidadeCarrinho: int
 
 @dataclass
 class User:
@@ -33,4 +36,16 @@ class Enterprise:
     telefone: str
     cnpj: str
     endereco: str
+    products: list[str] = field(default_factory=list)
+    sales: list[str] = field(default_factory=list)
+
+@dataclass
+class Sale:
+    _id: str
+    date: str
+    total: float
+    employee_id: str
+    employee_name: str
+    commission: float
+    number: int
     products: list[str] = field(default_factory=list)

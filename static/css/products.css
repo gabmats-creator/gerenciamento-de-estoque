@@ -85,14 +85,39 @@
     justify-content: center;
 }
 
+.button--sale {
+    position: absolute;
+    bottom: 10rem;
+    right: 2rem;
+    display: flex;
+    height: 5rem;
+    width: 5rem;
+    border: var(--border);
+    border-radius: 50%;
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.75rem;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
 @media screen and (min-width: 50em) {
     .button--add {
+        right: 3rem;
+    }
+    .button--sale {
         right: 3rem;
     }
 }
 
 @media screen and (min-width: 80em) {
     .button--add {
+        right: 4rem;
+    }
+    .button--sale {
         right: 4rem;
     }
 }

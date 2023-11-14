@@ -1,0 +1,98 @@
+{% from "macros/svgs.html" import trash, pencil %}
+{% from "macros/fields.html" import render_text_field %}
+
+{% extends "layout.html" %}
+
+{% block head_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+{% endblock %}
+
+{% block main_content %}
+    <h1>Carrinho</h1>
+    {% if product_data %}
+        <table class="table">
+            <colgroup>
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+            </colgroup>
+            
+            <thead>
+                <th class="table__cell table__cell--header">Nome da Conta</th>
+                <th class="table__cell table__cell--header">Valor</th>
+                <th class="table__cell table__cell--header">Data de vencimento</th>
+                <th class="table__cell table__cell--header">Descrição</th>
+                <th class="table__cell table__cell--header">Quantidade</th>
+                <th class="table__cell table__cell--header">Funcionário responsável</th>
+                <th class="table__cell table__cell--header"></th>
+                <th class="table__cell table__cell--header"></th>
+                <th class="table__cell table__cell--header"></th>
+            </thead>
+            <tbody>
+                {% for product in product_data %}
+                    <tr>
+                        <td class="table__cell">
+                            <p class="table__productname">{{ product.productName }}</p>
+                        </td>
+                        <td class="table__cell">{{ product.productValue }}</td>
+                        <td class="table__cell">{{ product.emmitDate }}</td>
+                        <td class="table__cell">{{ product.description}}</td>
+                        <td class="table__cell">{{ product.quantidadeCarrinho}}</td>
+                        <td class="table__cell">{{ product.employee_name}}</td>
+                        <td class="table__cell"><a class="product__edit" href="{{ url_for('edit_product', _id=product._id) }}">{{ pencil("pencil") }}</a></td>
+                        
+                        <td class="table__cell">
+                            <a href="{{ url_for('remove_kart', _id=product._id) }}" class="table__link" id="mostrarPopup">Remover</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="table__empty">Você ainda não possui nenhum produto no carrinho, deseja <a href="{{ url_for('add_product') }}" class="link">adicionar ao carrinho?</a>?</p>
+    {% endif %}
+
+    <a
+        href="{{ url_for('sale') }}" 
+        class="button button--add"
+    >
+    <span>+</span>
+    </a>
+
+    {% if delete_kart %}
+        <div class="overlay" id="overlay"></div>
+        </div>
+
+        <div class="popup" id="popup">
+            <h2>Deseja remover este produto do carrinho?</h2>
+            <form method="POST">
+                <input type="hidden" name="operacao" value="remove_kart">
+                <button type="submit">Confirmar</button>
+            </form>
+            <form method="POST">
+                <input type="hidden" name="operacao" value="cancelar">
+                <button type="submit">Cancelar</button>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if sale_kart %}
+        <div class="overlay" id="overlay"></div>
+        </div>
+
+        <div class="popup" id="popup">
+            <h2>Deseja realizar a venda dos produtos do carrinho??</h2>
+            <form method="POST">
+                <input type="hidden" name="operacao" value="confirmar">
+                <button type="submit">Confirmar</button>
+            </form>
+            <form method="POST">
+                <input type="hidden" name="operacao" value="cancelar">
+                <button type="submit">Cancelar</button>
+            </form>
+        </div>
+    {% endif %}
+    
+{% endblock %}
