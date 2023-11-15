@@ -388,7 +388,7 @@ def create_app():
                                 }
                             },
                         )
-                        prod_name = "{}({}unid.)".format(product_data["productName"], 1)
+                        prod_name = "{}({}un.)".format(product_data["productName"], 1)
                         create_sale(float(product_data["productValue"]), [prod_name])
 
                 return redirect(url_for(".products"))
@@ -411,7 +411,7 @@ def create_app():
                 for produto in product_data:
                     if produto["quantidadeCarrinho"]:
                         sale.append(
-                            "{}({}unid.)".format(
+                            "{}({}un.)".format(
                                 produto["productName"], produto["quantidadeCarrinho"]
                             )
                         )
