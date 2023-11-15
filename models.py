@@ -7,12 +7,10 @@ class Product:
     _id: str
     productName: str
     productValue: float
-    emmitDate: str
     description: str
     insertDate: str
     employee_name: str
     employee_id: str
-    carrinho: bool
     quantidadeTotal: int
     quantidadeCarrinho: int
 

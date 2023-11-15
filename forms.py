@@ -5,10 +5,8 @@ from wtforms.validators import InputRequired, NumberRange, Email, Length, EqualT
 class ProductForm(FlaskForm):
     product_name = StringField("Nome do produto", validators=[InputRequired(message="Esse campo é obrigatório")])
     product_value = FloatField("Valor do produto", validators=[InputRequired(message="Esse campo é obrigatório")])
-    emmit_date = DateField("Data de vencimento", validators=[InputRequired(message="Esse campo é obrigatório")])
+    amount = IntegerField("Quantidade", validators=[InputRequired(message="Esse campo é obrigatório"), NumberRange(min=1, message='O valor deve ser maior que zero.')])
     description = StringField("Descrição")
-    # opcoes = [('', 'Selecione uma opção'), ('mensal', 'Mensal'), ('anual', 'Anual'), ('uma vez', 'Uma vez')]
-    # frequence = SelectField('Recorrência', choices=opcoes)
     submit = SubmitField("Registrar")
 
 class RegisterForm(FlaskForm):
