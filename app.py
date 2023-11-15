@@ -44,16 +44,14 @@ def create_app():
         formatted_value = locale.currency(float_value, grouping=True, symbol=None)
 
         return formatted_value
-    
+
     def create_sale(total, products):
         commission = total * 0.07
         insertion_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         user_data = current_app.db.users.find_one({"email": session["email"]})
         user = User(**user_data)
         number = 1
-        sale_data = current_app.db.sales.find(
-            {"employee_id": user._id}
-        )
+        sale_data = current_app.db.sales.find({"employee_id": user._id})
         for sale in sale_data:
             number += 1
 
@@ -94,7 +92,7 @@ def create_app():
             cargo=user.admin,
         )
 
-    @app.route("/contas-disponiveis", methods=["GET", "POST"])
+    @app.route("/produtos-disponiveis", methods=["GET", "POST"])
     @login_required
     def products(
         confirm_delete=None,
@@ -225,7 +223,7 @@ def create_app():
             message=message,
         )
 
-    @app.route("/conta/<string:_id>", methods=["GET", "POST"])
+    @app.route("/produto/<string:_id>", methods=["GET", "POST"])
     @login_required
     def delete_product(_id: str):
         if request.method == "POST":
@@ -310,7 +308,9 @@ def create_app():
         if request.method == "POST":
             operacao = request.form.get("operacao")
             if operacao == "confirmar":
-                amount = int(request.form.get("amount")) if request.form.get("amount") else 0
+                amount = (
+                    int(request.form.get("amount")) if request.form.get("amount") else 0
+                )
                 qtde = product_data["quantidadeCarrinho"] + amount
                 if qtde <= product_data["quantidadeTotal"]:
                     current_app.db.products.update_one(
@@ -318,7 +318,13 @@ def create_app():
                     )
                 else:
                     erro = "A quantidade inserida no carrinho não pode ser maior que a quantidade total em estoque"
-                    return products(confirm_kart=True, qtdeDispo=product_data["quantidadeTotal"] - product_data["quantidadeCarrinho"], qtdeCarrinho=product_data["quantidadeCarrinho"], erro=erro)
+                    return products(
+                        confirm_kart=True,
+                        qtdeDispo=product_data["quantidadeTotal"]
+                        - product_data["quantidadeCarrinho"],
+                        qtdeCarrinho=product_data["quantidadeCarrinho"],
+                        erro=erro,
+                    )
 
             return redirect(url_for(".products"))
 
@@ -342,7 +348,7 @@ def create_app():
             return redirect(url_for(".shopping_kart"))
 
         return shopping_kart(delete_kart=True)
-    
+
     @app.route("/carrinho-confirmar-venda/", methods=["GET", "POST"])
     @login_required
     def sale():
@@ -350,21 +356,30 @@ def create_app():
             if request.method == "POST":
                 operacao = request.form.get("operacao")
                 if operacao == "confirmar":
-                    user_data = current_app.db.users.find_one({"email": session["email"]})
+                    user_data = current_app.db.users.find_one(
+                        {"email": session["email"]}
+                    )
                     user = User(**user_data)
                     enterprise_data = current_app.db.enterprises.find_one(
                         {"_id": user.enterprise_id}
                     )
                     enterprise = Enterprise(**enterprise_data)
-                    product_data = current_app.db.products.find_one({"_id": request.args.get("_id")})
+                    product_data = current_app.db.products.find_one(
+                        {"_id": request.args.get("_id")}
+                    )
                     current_app.db.products.update_one(
-                        {"_id": request.args.get("_id")}, {"$set": {"quantidadeTotal": product_data["quantidadeTotal"] - 1}}
+                        {"_id": request.args.get("_id")},
+                        {
+                            "$set": {
+                                "quantidadeTotal": product_data["quantidadeTotal"] - 1
+                            }
+                        },
                     )
                     # Já atualizei a quantidade do produto, preciso pedir pro usuário informar, depois, pegar o valor do produto * quantidade pra calcular sua comissão
 
                 return redirect(url_for(".products"))
             return products(sale_kart=True)
-        
+
         if request.method == "POST":
             operacao = request.form.get("operacao")
             if operacao == "confirmar":
@@ -381,25 +396,36 @@ def create_app():
                 total = 0.0
                 for produto in product_data:
                     if produto["quantidadeCarrinho"]:
-                        sale.append("{}({})".format(produto["productName"], produto["quantidadeCarrinho"]))
-                        total += float(produto["productValue"]) * int(produto["quantidadeCarrinho"])
+                        sale.append(
+                            "{}({}unid.)".format(
+                                produto["productName"], produto["quantidadeCarrinho"]
+                            )
+                        )
+                        total += float(produto["productValue"]) * int(
+                            produto["quantidadeCarrinho"]
+                        )
                         current_app.db.products.update_one(
-                            {"_id": produto["_id"]}, {"$set": {"quantidadeCarrinho": 0, "quantidadeTotal": produto["quantidadeTotal"] - produto["quantidadeCarrinho"]}}
+                            {"_id": produto["_id"]},
+                            {
+                                "$set": {
+                                    "quantidadeCarrinho": 0,
+                                    "quantidadeTotal": produto["quantidadeTotal"]
+                                    - produto["quantidadeCarrinho"],
+                                }
+                            },
                         )
                 create_sale(total, sale)
 
             return redirect(url_for(".shopping_kart"))
 
         return shopping_kart(sale_kart=True)
-    
+
     @app.route("/your-sales")
     @login_required
     def your_sales():
         user_data = current_app.db.users.find_one({"email": session["email"]})
         user = User(**user_data)
-        sale_data = current_app.db.sales.find(
-            {"employee_id": user._id}
-        )
+        sale_data = current_app.db.sales.find({"employee_id": user._id})
         sale = [Sale(**sal) for sal in sale_data]
 
         return render_template("your_sales.html", vendas=sale)

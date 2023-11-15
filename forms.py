@@ -38,9 +38,6 @@ class StringListField(TextAreaField):
         else:
             self.data = []
 
-class ExtendedBillForm(ProductForm):
-    submit = SubmitField("Enviar")
-
 class EnterpriseForm(FlaskForm):
     enterprise_name = StringField("Nome da empresa", validators=[InputRequired(message="Esse campo é obrigatório")])
     address = StringField("Endereço", validators=[InputRequired(message="Esse campo é obrigatório")])
