@@ -1,0 +1,48 @@
+{% from "macros/fields.html" import render_text_field %}
+
+{% extends "layout.html" %}
+
+{% block head_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+{% endblock %}
+
+{% block main_content %}
+    <h1>Todas as vendas</h1>
+    {% if sale_data %}
+        <table class="table">
+            <colgroup>
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+            </colgroup>
+            
+            <thead>
+                <th class="table__cell table__cell--header">Venda n°</th>
+                <th class="table__cell table__cell--header">Data</th>
+                <th class="table__cell table__cell--header">Funcionário responsável</th>
+                <th class="table__cell table__cell--header">Total R$</th>
+                <th class="table__cell table__cell--header">Comissão</th>
+                <th class="table__cell table__cell--header"></th>
+                <th class="table__cell table__cell--header"></th>
+            </thead>
+            <tbody>
+                {% for sale in sale_data %}
+                    <tr>
+                        <td class="table__cell">
+                            <p class="table__productname">{{ sale.number }}</p>
+                        </td>
+                        <td class="table__cell">{{ sale.date }}</td>
+                        <td class="table__cell">{{ sale.employee_name }}</td>
+                        <td class="table__cell">{{ sale.total }}</td>
+                        <td class="table__cell">{{ sale.commission }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="table__empty">Não há vendas para mostrar</p>
+    {% endif %}
+
+{% endblock %}

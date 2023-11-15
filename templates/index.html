@@ -66,12 +66,6 @@
         <span class="nav__item">Todos os produtos</span>
     </a>
     <a
-        href="{{ url_for('products') }}" 
-        class="nav__link"
-    >
-        <span class="nav__item">Realizar venda</span>
-    </a>
-    <a
         href="{{ url_for('shopping_kart') }}"
         class="nav__link"
     >
@@ -85,10 +79,22 @@
     </a>
     {% if cargo %}
         <a
-            href="{{ url_for('add_product') }}" 
+            href="{{ url_for('new_employee') }}" 
             class="nav__link"
         >
             <span class="nav__item">Adicionar novo funcionário</span>
+        </a>
+        <a
+            href="{{ url_for('employees') }}" 
+            class="nav__link"
+        >
+            <span class="nav__item">Todos os funcionários</span>
+        </a>
+        <a
+            href="{{ url_for('all_sales') }}" 
+            class="nav__link"
+        >
+            <span class="nav__item">Todas as vendas</span>
         </a>
     {% endif %}
 

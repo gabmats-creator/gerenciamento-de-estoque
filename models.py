@@ -23,6 +23,7 @@ class User:
     cnpj: str
     admin: bool
     enterprise_id: str
+    totalCommission: float
     password: str
     products: list[str] = field(default_factory=list)
 
@@ -46,4 +47,5 @@ class Sale:
     employee_name: str
     commission: float
     number: int
+    enterprise_id: str
     products: list[str] = field(default_factory=list)
