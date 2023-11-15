@@ -42,7 +42,7 @@ def create_app():
         valor_formatado = f"R$ {valor:.2f}"
 
         return valor_formatado
-    
+
     def format_today_date():
         return datetime.now().strftime("%d/%m/%Y %H:%M")
 
@@ -69,8 +69,13 @@ def create_app():
         )
         current_app.db.sales.insert_one(asdict(sale))
         current_app.db.users.update_one(
-                {"_id": user._id}, {"$set": {"totalCommission": round(float(user.totalCommission) + commission)}}
-            )
+            {"_id": user._id},
+            {
+                "$set": {
+                    "totalCommission": round(float(user.totalCommission) + commission)
+                }
+            },
+        )
 
     @app.route("/")
     @login_required
@@ -241,7 +246,13 @@ def create_app():
                 user = User(**user_data)
                 current_app.db.products.update_one(
                     {"_id": _id},
-                    {"$set": {"employee_name": user.name, "employee_id": user._id, "insertDate": format_today_date()}},
+                    {
+                        "$set": {
+                            "employee_name": user.name,
+                            "employee_id": user._id,
+                            "insertDate": format_today_date(),
+                        }
+                    },
                 )
                 if request.form.get("productName"):
                     current_app.db.products.update_one(
@@ -261,9 +272,9 @@ def create_app():
                     )
                     if qtdeTotal < product[0].quantidadeCarrinho:
                         current_app.db.products.update_one(
-                        {"_id": _id},
-                        {"$set": {"quantidadeCarrinho": qtdeTotal}},
-                    )
+                            {"_id": _id},
+                            {"$set": {"quantidadeCarrinho": qtdeTotal}},
+                        )
 
                 current_app.db.products.update_one(
                     {"_id": _id},
@@ -372,7 +383,8 @@ def create_app():
                             {"_id": request.args.get("_id")},
                             {
                                 "$set": {
-                                    "quantidadeTotal": product_data["quantidadeTotal"] - 1
+                                    "quantidadeTotal": product_data["quantidadeTotal"]
+                                    - 1
                                 }
                             },
                         )
@@ -434,7 +446,7 @@ def create_app():
             venda.total = formata_reais(float(venda.total))
 
         return render_template("your_sales.html", vendas=sale)
-    
+
     @app.route("/vendas")
     @login_required
     def all_sales():
@@ -460,7 +472,7 @@ def create_app():
             session["theme"] = "dark"
 
         return redirect(request.args.get("current_page"))
-    
+
     @app.route("/novo-funcionario", methods=["GET", "POST"])
     @login_required
     def new_employee():
@@ -490,20 +502,27 @@ def create_app():
         return render_template(
             "new_employee.html", title="StockControl - Novo Funcionário", form=form
         )
-    
+
     @app.route("/funcionários")
     @login_required
     def employees(confirm_edit=None, employee_data=None, confirm_delete=None):
         if not employee_data:
             _user_data = current_app.db.users.find_one({"email": session["email"]})
             _user = User(**_user_data)
-            user_data = current_app.db.users.find({"enterprise_id": _user.enterprise_id})
+            user_data = current_app.db.users.find(
+                {"enterprise_id": _user.enterprise_id}
+            )
             employee_data = [User(**us) for us in user_data]
             for emp in employee_data:
                 emp.totalCommission = formata_reais(emp.totalCommission)
-                
-        return render_template("employees.html", employee_data=employee_data, confirm_edit=confirm_edit, confirm_delete=confirm_delete)
-    
+
+        return render_template(
+            "employees.html",
+            employee_data=employee_data,
+            confirm_edit=confirm_edit,
+            confirm_delete=confirm_delete,
+        )
+
     @app.route("/edit-employee/<string:_id>", methods=["GET", "POST"])
     @login_required
     def edit_employee(_id: str):
@@ -537,24 +556,23 @@ def create_app():
             return redirect(url_for(".employees"))
 
         return employees(confirm_edit=True, employee_data=user)
-    
+
     @app.route("/delete-employee/<string:_id>", methods=["GET", "POST"])
     @login_required
     def delete_employee(_id: str):
         if request.method == "POST":
-            operacao = request.form.get('operacao')
+            operacao = request.form.get("operacao")
             if operacao == "excluir":
                 user_data = current_app.db.users.find_one({"email": session["email"]})
                 user = User(**user_data)
-                current_app.db.users.delete_one({'_id': _id})
+                current_app.db.users.delete_one({"_id": _id})
                 if _id == user._id:
-                    current_app.db.enterprises.delete_one({'_id': user.enterprise_id})
+                    current_app.db.enterprises.delete_one({"_id": user.enterprise_id})
                     session.clear()
 
             return redirect(url_for(".employees"))
 
         return employees(confirm_delete=True)
-        
 
     @app.route("/registrar", methods=["GET", "POST"])
     def register():
