@@ -1,0 +1,109 @@
+{% from "macros/fields.html" import render_text_field %}
+
+{% extends "layout.html" %}
+
+{% block head_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+{% endblock %}
+
+{% block main_content %}
+    <h1>Todos os funcionários</h1>
+    {% if employee_data %}
+        <table class="table">
+            <colgroup>
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+                <col style="width: 20%">
+            </colgroup>
+            
+            <thead>
+                <th class="table__cell table__cell--header">Nome</th>
+                <th class="table__cell table__cell--header">E-mail</th>
+                <th class="table__cell table__cell--header">Telefone</th>
+                <th class="table__cell table__cell--header">Cargo</th>
+                <th class="table__cell table__cell--header">Total de comissões</th>
+                <th class="table__cell table__cell--header"></th>
+                <th class="table__cell table__cell--header"></th>
+                <th class="table__cell table__cell--header"></th>
+            </thead>
+            <tbody>
+                {% for employee in employee_data %}
+                    <tr>
+                        <td class="table__cell">
+                            <p class="table__productname">{{ employee.name }}</p>
+                        </td>
+                        <td class="table__cell">{{ employee.email }}</td>
+                        <td class="table__cell">{{ employee.telefone }}</td>
+                        {% if employee.admin %}
+                            <td class="table__cell">Gerente</td>
+                        {% else %}
+                            <td class="table__cell">Funcionário</td>
+                        {% endif %}
+                        <td class="table__cell">{{ employee.totalCommission }}</td>
+                        <td class="table__cell">
+                            <a href="{{ url_for('edit_employee', _id=employee._id) }}" class="table__link" id="mostrarPopup">Editar</a>
+                        </td>
+                        <td class="table__cell">
+                            <a href="{{ url_for('delete_employee', _id=employee._id) }}" class="table__link" id="mostrarPopup">Excluir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="table__empty">Você ainda não possui nenhum funcionário <a href="{{ url_for('new_employee') }}" class="link">adicionar um funcionário?</a>?</p>
+    {% endif %}
+
+    <a
+        href="{{ url_for('add_product') }}" 
+        class="button button--add"
+    >
+    <span>+</span>
+    </a>
+
+    {% if confirm_edit %}
+        <div class="overlay" id="overlay"></div>
+        <div class="popup" id="popup">
+            <h2>Editar dados</h2>
+            <p>com essas alterações, o funcionário responsável por esse produto passará a ser você </p>
+            {% for employee in employee_data %}
+                <form method="POST">
+                    <label for="name">Nome</label>
+                    <input id="name" type="text" value="{{ employee.name }}" name="name" placeholder="Novo nome do funcionário">
+                    <label for="email">E-mail</label>
+                    <input id="email" type="text" value="{{ employee.email }}" name="email" placeholder="Novo E-mail">
+                    <label for="telefone">Telefone</label>
+                    <input id="telefone" type="text" value="{{ employee.telefone }}" name="telefone" placeholder="Novo telefone">
+                    <input  type="hidden" name="operacao" value="Confirmar">
+                        <button type="submit">Confirmar</button>
+                </form>
+            {% endfor %}
+            
+            <form method="POST">
+                <input type="hidden" name="operacao" value="cancelar">
+                <button type="submit">Cancelar</button>
+            </form>
+        </div>
+    
+    {% endif %}
+    {% if confirm_delete %}
+        <div class="overlay" id="overlay"></div>
+        </div>
+
+        <div class="popup" id="popup">
+            <h2>Deseja excluir este funcionário?</h2>
+            <p>Esta ação é definitiva</p>
+            <form method="POST">
+                <input type="hidden" name="operacao" value="excluir">
+                <button type="submit">Excluir</button>
+            </form>
+            <form method="POST">
+                <input type="hidden" name="operacao" value="cancelar">
+                <button type="submit">Cancelar</button>
+            </form>
+        </div>
+    {% endif %}
+
+{% endblock %}

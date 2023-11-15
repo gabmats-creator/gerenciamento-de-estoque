@@ -22,8 +22,8 @@
                 <th class="table__cell table__cell--header">Venda</th>
                 <th class="table__cell table__cell--header">Produto/quantidade</th>
                 <th class="table__cell table__cell--header">Realizada em</th>
+                <th class="table__cell table__cell--header">Valor total</th>
                 <th class="table__cell table__cell--header">Comissão total</th>
-                <th class="table__cell table__cell--header"></th>
                 <th class="table__cell table__cell--header"></th>
                 <th class="table__cell table__cell--header"></th>
             </thead>
@@ -39,8 +39,8 @@
                             {% endfor %}
                         </td>
                         <td class="table__cell">{{ venda.date }}</td>
+                        <td class="table__cell">{{ venda.total}}</td>
                         <td class="table__cell">{{ venda.commission }}</td>
-                        <td class="table__cell">{{ venda.quantidadeTotal}}</td>
                     </tr>
                 {% endfor %}
             </tbody>

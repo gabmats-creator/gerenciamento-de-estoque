@@ -9,7 +9,56 @@
 
 {% block main_content %}
     <h1>Produtos disponíveis</h1>
-    {% if product_data %}
+    <table class="table">
+        <colgroup>
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+        </colgroup>
+        
+        <thead>
+            <th class="table__cell table__cell--header">Nome da Conta</th>
+            <th class="table__cell table__cell--header">Valor</th>
+            <th class="table__cell table__cell--header">Última alteração</th>
+            <th class="table__cell table__cell--header">Descrição</th>
+            <th class="table__cell table__cell--header">Quantidade</th>
+            <th class="table__cell table__cell--header">Funcionário responsável</th>
+            <th class="table__cell table__cell--header"></th>
+            <th class="table__cell table__cell--header"></th>
+            <th class="table__cell table__cell--header"></th>
+        </thead>
+    {% if not product_data %}
+        </table>
+    {% else %}
+            <tbody>
+                {% for product in product_data %}
+                    <tr>
+                        <td class="table__cell">
+                            <p class="table__productname">{{ product.productName }}</p>
+                        </td>
+                        <td class="table__cell">{{ product.productValue }}</td>
+                        <td class="table__cell">{{ product.insertDate }}</td>
+                        <td class="table__cell">{{ product.description}}</td>
+                        <td class="table__cell">{{ product.quantidadeTotal}}</td>
+                        <td class="table__cell">{{ product.employee_name}}</td>
+                        <td class="table__cell">
+                            <a href="{{ url_for('edit_product', _id=product._id) }}" class="table__link" id="mostrarPopup">Editar</a>
+                        </td>
+                        <td class="table__cell">
+                            <a href="{{ url_for('confirm_kart', _id=product._id) }}" class="table__link" id="mostrarPopup">Adicionar ao carrinho</a>
+                        </td>
+                        <td class="table__cell">
+                            <a href="{{ url_for('sale', _id=product._id) }}" class="table__link" id="mostrarPopup">Saída rápida</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% if indisp %}
+        <h1>Produtos indisponíveis</h1>
         <table class="table">
             <colgroup>
                 <col style="width: 20%">
@@ -31,30 +80,25 @@
                 <th class="table__cell table__cell--header"></th>
             </thead>
             <tbody>
-                {% for product in product_data %}
+                {% for ind in indisp %}
                     <tr>
                         <td class="table__cell">
-                            <p class="table__productname">{{ product.productName }}</p>
+                            <p class="table__productname">{{ ind.productName }}</p>
                         </td>
-                        <td class="table__cell">{{ product.productValue }}</td>
-                        <td class="table__cell">{{ product.insertDate }}</td>
-                        <td class="table__cell">{{ product.description}}</td>
-                        <td class="table__cell">{{ product.quantidadeTotal}}</td>
-                        <td class="table__cell">{{ product.employee_name}}</td>
+                        <td class="table__cell">{{ ind.productValue }}</td>
+                        <td class="table__cell">{{ ind.insertDate }}</td>
+                        <td class="table__cell">{{ ind.description}}</td>
+                        <td class="table__cell">{{ ind.quantidadeTotal}}</td>
+                        <td class="table__cell">{{ ind.employee_name}}</td>
                         <td class="table__cell">
-                            <a href="{{ url_for('edit_product', _id=product._id) }}" class="table__link" id="mostrarPopup">Editar</a>
-                        </td>
-                        <td class="table__cell">
-                            <a href="{{ url_for('confirm_kart', _id=product._id) }}" class="table__link" id="mostrarPopup">Adicionar ao carrinho</a>
-                        </td>
-                        <td class="table__cell">
-                            <a href="{{ url_for('sale', _id=product._id) }}" class="table__link" id="mostrarPopup">Vender</a>
+                            <a href="{{ url_for('edit_product', _id=indisp._id) }}" class="table__link" id="mostrarPopup">Editar</a>
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-    {% else %}
+    {% endif %}
+    {% if not indisp and not product_data %}
         <p class="table__empty">Você ainda não possui nenhum produto, deseja <a href="{{ url_for('add_product') }}" class="link">adicionar um produto?</a>?</p>
     {% endif %}
 
@@ -122,7 +166,7 @@
         </div>
 
         <div class="popup" id="popup">
-            <h2>Deseja realizar a venda deste produto?</h2>
+            <h2>Deseja realizar a saída rápida de 1 unidade deste produto?</h2>
             <p>Esta ação é definitiva</p>
             <form method="POST">
                 <input type="hidden" name="operacao" value="confirmar">

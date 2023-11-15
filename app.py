@@ -38,29 +38,19 @@ def create_app():
 
         return route_wrapper
 
-    def real_format(value):
-        locale.setlocale(locale.LC_ALL, "pt_BR.utf8")
-        float_value = value
-        formatted_value = locale.currency(float_value, grouping=True, symbol=None)
+    def formata_reais(valor):
+        valor_formatado = f"R$ {valor:.2f}"
 
-        return formatted_value
+        return valor_formatado
     
     def format_today_date():
-        data_hora_atual = datetime.now()
-        dia = data_hora_atual.day
-        mes = data_hora_atual.month
-        ano = data_hora_atual.year
-        hora = data_hora_atual.hour
-        data_hora_personalizada = datetime(ano, mes, dia, hora)
-        formato = "%d/%m/%Y %H:%M"
-
-        return data_hora_personalizada.strftime(formato)
+        return datetime.now().strftime("%d/%m/%Y %H:%M")
 
     def create_sale(total, products):
         commission = total * 0.07
-        insertion_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         user_data = current_app.db.users.find_one({"email": session["email"]})
         user = User(**user_data)
+
         number = 1
         sale_data = current_app.db.sales.find({"employee_id": user._id})
         for sale in sale_data:
@@ -68,15 +58,19 @@ def create_app():
 
         sale = Sale(
             _id=uuid.uuid4().hex,
-            date=insertion_date,
+            date=format_today_date(),
             total=total,
             employee_id=user._id,
             employee_name=user.name,
             commission=round(commission),
-            products=products,
             number=number,
+            enterprise_id=user.enterprise_id,
+            products=products,
         )
         current_app.db.sales.insert_one(asdict(sale))
+        current_app.db.users.update_one(
+                {"_id": user._id}, {"$set": {"totalCommission": round(float(user.totalCommission) + commission)}}
+            )
 
     @app.route("/")
     @login_required
@@ -93,6 +87,8 @@ def create_app():
             .limit(3)
         )
         product = [Product(**product) for product in product_data]
+        for produto in product:
+            produto.productValue = formata_reais(float(produto.productValue))
 
         return render_template(
             "index.html",
@@ -103,7 +99,7 @@ def create_app():
             cargo=user.admin,
         )
 
-    @app.route("/produtos-disponiveis", methods=["GET", "POST"])
+    @app.route("/produtos", methods=["GET", "POST"])
     @login_required
     def products(
         confirm_edit=None,
@@ -120,16 +116,25 @@ def create_app():
             {"_id": user.enterprise_id}
         )
         enterprise = Enterprise(**enterprise_data)
+        indisp = None
         if not product:
             product_data = current_app.db.products.find(
                 {"_id": {"$in": enterprise.products}, "quantidadeTotal": {"$gt": 0}}
             )
             product = [Product(**prod) for prod in product_data]
+            for produto in product:
+                produto.productValue = formata_reais(float(produto.productValue))
+
+            indisp_data = current_app.db.products.find(
+                {"_id": {"$in": enterprise.products}, "quantidadeTotal": 0}
+            )
+            indisp = [Product(**ind) for ind in indisp_data]
 
         return render_template(
             "products.html",
-            title="Stock Control - Contas a Pagar",
+            title="Stock Control - Produtos",
             product_data=product,
+            indisp=indisp,
             confirm_kart=confirm_kart,
             erro=erro,
             qtdeDispo=qtdeDispo,
@@ -216,7 +221,6 @@ def create_app():
                 {"_id": user_id}, {"$set": {"enterprise_id": enterprise._id}}
             )
 
-            flash("Usuário registrado com sucesso!")
             return redirect(url_for(".login"))
         return render_template(
             "new_enterprise.html",
@@ -284,10 +288,12 @@ def create_app():
             {"_id": {"$in": enterprise.products}, "quantidadeCarrinho": {"$ne": 0}}
         )
         product = [Product(**prod) for prod in product_data]
+        for produto in product:
+            produto.productValue = formata_reais(produto.productValue)
 
         return render_template(
             "shopping_kart.html",
-            title="Stock Control - Contas a Pagar",
+            title="Stock Control - Carrinho",
             product_data=product,
             delete_kart=delete_kart,
             confirm_edit=confirm_edit,
@@ -336,7 +342,7 @@ def create_app():
             operacao = request.form.get("operacao")
             if operacao == "remove_kart":
                 current_app.db.products.update_one(
-                    {"_id": _id}, {"$set": {"carrinho": False}}
+                    {"_id": _id}, {"$set": {"quantidadeCarrinho": 0}}
                 )
 
             return redirect(url_for(".shopping_kart"))
@@ -361,15 +367,17 @@ def create_app():
                     product_data = current_app.db.products.find_one(
                         {"_id": request.args.get("_id")}
                     )
-                    current_app.db.products.update_one(
-                        {"_id": request.args.get("_id")},
-                        {
-                            "$set": {
-                                "quantidadeTotal": product_data["quantidadeTotal"] - 1
-                            }
-                        },
-                    )
-                    # Já atualizei a quantidade do produto, preciso pedir pro usuário informar, depois, pegar o valor do produto * quantidade pra calcular sua comissão
+                    if product_data["quantidadeTotal"] > 0:
+                        current_app.db.products.update_one(
+                            {"_id": request.args.get("_id")},
+                            {
+                                "$set": {
+                                    "quantidadeTotal": product_data["quantidadeTotal"] - 1
+                                }
+                            },
+                        )
+                        prod_name = "{}({}unid.)".format(product_data["productName"], 1)
+                        create_sale(float(product_data["productValue"]), [prod_name])
 
                 return redirect(url_for(".products"))
             return products(sale_kart=True)
@@ -414,15 +422,34 @@ def create_app():
 
         return shopping_kart(sale_kart=True)
 
-    @app.route("/your-sales")
+    @app.route("/suas-vendas")
     @login_required
     def your_sales():
         user_data = current_app.db.users.find_one({"email": session["email"]})
         user = User(**user_data)
         sale_data = current_app.db.sales.find({"employee_id": user._id})
         sale = [Sale(**sal) for sal in sale_data]
+        for venda in sale:
+            venda.commission = formata_reais(float(venda.commission))
+            venda.total = formata_reais(float(venda.total))
 
         return render_template("your_sales.html", vendas=sale)
+    
+    @app.route("/vendas")
+    @login_required
+    def all_sales():
+        user_data = current_app.db.users.find_one({"email": session["email"]})
+        user = User(**user_data)
+        enterprise_data = current_app.db.enterprises.find_one(
+            {"_id": user.enterprise_id}
+        )
+        enterprise = Enterprise(**enterprise_data)
+        sale_data = current_app.db.sales.find({"enterprise_id": enterprise._id})
+        sales = [Sale(**sal) for sal in sale_data]
+        for venda in sales:
+            venda.commission = formata_reais(float(venda.commission))
+            venda.total = formata_reais(venda.total)
+        return render_template("all_sales.html", sale_data=sales)
 
     @app.get("/toggle-theme")
     def toggle_theme():
@@ -433,6 +460,101 @@ def create_app():
             session["theme"] = "dark"
 
         return redirect(request.args.get("current_page"))
+    
+    @app.route("/novo-funcionario", methods=["GET", "POST"])
+    @login_required
+    def new_employee():
+        form = RegisterForm()
+
+        if request.method == "POST":
+            if current_app.db.users.find_one({"email": form.email.data}):
+                flash("Este email já está em uso", category="danger")
+                return redirect(url_for(".new_employee"))
+            else:
+                user_data = current_app.db.users.find_one({"email": session["email"]})
+                _user = User(**user_data)
+                user = User(
+                    _id=uuid.uuid4().hex,
+                    name=form.nome.data,
+                    email=form.email.data,
+                    telefone=form.telefone.data,
+                    cnpj=_user.cnpj,
+                    admin=False,
+                    enterprise_id=_user.enterprise_id,
+                    password=pbkdf2_sha256.hash(form.password.data),
+                )
+                current_app.db.users.insert_one(asdict(user))
+
+                return redirect(url_for(".index"))
+
+        return render_template(
+            "new_employee.html", title="StockControl - Novo Funcionário", form=form
+        )
+    
+    @app.route("/funcionários")
+    @login_required
+    def employees(confirm_edit=None, employee_data=None, confirm_delete=None):
+        if not employee_data:
+            _user_data = current_app.db.users.find_one({"email": session["email"]})
+            _user = User(**_user_data)
+            user_data = current_app.db.users.find({"enterprise_id": _user.enterprise_id})
+            employee_data = [User(**us) for us in user_data]
+            for emp in employee_data:
+                emp.totalCommission = formata_reais(emp.totalCommission)
+                
+        return render_template("employees.html", employee_data=employee_data, confirm_edit=confirm_edit, confirm_delete=confirm_delete)
+    
+    @app.route("/edit-employee/<string:_id>", methods=["GET", "POST"])
+    @login_required
+    def edit_employee(_id: str):
+        operacao = request.form.get("operacao")
+        user_data = current_app.db.users.find({"_id": _id})
+        user = [User(**us) for us in user_data]
+        if request.method == "POST":
+            if operacao == "Confirmar":
+                if request.form.get("name"):
+                    current_app.db.users.update_one(
+                        {"_id": _id},
+                        {"$set": {"name": request.form.get("name")}},
+                    )
+                if request.form.get("email"):
+                    found = False
+                    if user[0].email == session["email"]:
+                        found = True
+                    current_app.db.users.update_one(
+                        {"_id": _id},
+                        {"$set": {"email": request.form.get("email")}},
+                    )
+                    if found:
+                        session["email"] = request.form.get("email")
+
+                if request.form.get("telefone"):
+                    current_app.db.users.update_one(
+                        {"_id": _id},
+                        {"$set": {"telefone": request.form.get("telefone")}},
+                    )
+
+            return redirect(url_for(".employees"))
+
+        return employees(confirm_edit=True, employee_data=user)
+    
+    @app.route("/delete-employee/<string:_id>", methods=["GET", "POST"])
+    @login_required
+    def delete_employee(_id: str):
+        if request.method == "POST":
+            operacao = request.form.get('operacao')
+            if operacao == "excluir":
+                user_data = current_app.db.users.find_one({"email": session["email"]})
+                user = User(**user_data)
+                current_app.db.users.delete_one({'_id': _id})
+                if _id == user._id:
+                    current_app.db.enterprises.delete_one({'_id': user.enterprise_id})
+                    session.clear()
+
+            return redirect(url_for(".employees"))
+
+        return employees(confirm_delete=True)
+        
 
     @app.route("/registrar", methods=["GET", "POST"])
     def register():
@@ -462,6 +584,7 @@ def create_app():
                     cnpj=form.cnpj.data,
                     admin=admin,
                     enterprise_id=enterprise_id,
+                    totalCommission=0,
                     password=pbkdf2_sha256.hash(form.password.data),
                 )
                 current_app.db.users.insert_one(asdict(user))
