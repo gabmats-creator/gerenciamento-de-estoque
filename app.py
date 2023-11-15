@@ -44,6 +44,17 @@ def create_app():
         formatted_value = locale.currency(float_value, grouping=True, symbol=None)
 
         return formatted_value
+    
+    def format_today_date():
+        data_hora_atual = datetime.now()
+        dia = data_hora_atual.day
+        mes = data_hora_atual.month
+        ano = data_hora_atual.year
+        hora = data_hora_atual.hour
+        data_hora_personalizada = datetime(ano, mes, dia, hora)
+        formato = "%d/%m/%Y %H:%M"
+
+        return data_hora_personalizada.strftime(formato)
 
     def create_sale(total, products):
         commission = total * 0.07
@@ -95,7 +106,6 @@ def create_app():
     @app.route("/produtos-disponiveis", methods=["GET", "POST"])
     @login_required
     def products(
-        confirm_delete=None,
         confirm_edit=None,
         product=None,
         confirm_kart=None,
@@ -120,13 +130,12 @@ def create_app():
             "products.html",
             title="Stock Control - Contas a Pagar",
             product_data=product,
-            confirm_delete=confirm_delete,
-            confirm_edit=confirm_edit,
             confirm_kart=confirm_kart,
             erro=erro,
             qtdeDispo=qtdeDispo,
             qtdeCarrinho=qtdeCarrinho,
             sale_kart=sale_kart,
+            confirm_edit=confirm_edit,
         )
 
     @app.route("/add", methods=["GET", "POST"])
@@ -135,11 +144,6 @@ def create_app():
         form = ProductForm()
 
         if form.validate_on_submit():
-            emmit_date = str(form.emmit_date.data)
-            emmit_formatted = datetime.strptime(emmit_date, "%Y-%m-%d").strftime(
-                "%d-%m-%Y"
-            )
-            insertion_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             description = "" if not form.description.data else form.description.data
             user_data = current_app.db.users.find_one({"email": session["email"]})
             user = User(**user_data)
@@ -162,14 +166,12 @@ def create_app():
                     _id=uuid.uuid4().hex,
                     productName=form.product_name.data,
                     productValue=form.product_value.data,
-                    emmitDate=emmit_formatted,
                     description=description,
-                    insertDate=insertion_date,
+                    insertDate=format_today_date(),
                     employee_name=user.name,
                     employee_id=user._id,
-                    quantidadeTotal=1,
+                    quantidadeTotal=form.amount.data,
                     quantidadeCarrinho=0,
-                    carrinho=False,
                 )
                 current_app.db.products.insert_one(asdict(product))
                 current_app.db.enterprises.update_one(
@@ -181,7 +183,7 @@ def create_app():
                     {"_id": _id},
                     {
                         "$set": {
-                            "quantidadeTotal": quantidade + 1,
+                            "quantidadeTotal": quantidade + form.amount.data,
                             "employee_name": user.name,
                             "productValue": form.product_value.data,
                         }
@@ -223,18 +225,6 @@ def create_app():
             message=message,
         )
 
-    @app.route("/produto/<string:_id>", methods=["GET", "POST"])
-    @login_required
-    def delete_product(_id: str):
-        if request.method == "POST":
-            operacao = request.form.get("operacao")
-            if operacao == "excluir":
-                current_app.db.products.delete_one({"_id": _id})
-
-            return redirect(url_for(".products"))
-
-        return products(confirm_delete=True)
-
     @app.route("/edit/<string:_id>", methods=["GET", "POST"])
     @login_required
     def edit_product(_id: str):
@@ -243,6 +233,12 @@ def create_app():
         product = [Product(**prod) for prod in products_data]
         if request.method == "POST":
             if operacao == "Confirmar":
+                user_data = current_app.db.users.find_one({"email": session["email"]})
+                user = User(**user_data)
+                current_app.db.products.update_one(
+                    {"_id": _id},
+                    {"$set": {"employee_name": user.name, "employee_id": user._id, "insertDate": format_today_date()}},
+                )
                 if request.form.get("productName"):
                     current_app.db.products.update_one(
                         {"_id": _id},
@@ -253,18 +249,16 @@ def create_app():
                         {"_id": _id},
                         {"$set": {"productValue": request.form.get("productValue")}},
                     )
-                if request.form.get("employee"):
+                qtdeTotal = int(request.form.get("quantidadeTotal"))
+                if qtdeTotal >= 0:
                     current_app.db.products.update_one(
                         {"_id": _id},
-                        {"$set": {"employee": request.form.get("employee")}},
+                        {"$set": {"quantidadeTotal": qtdeTotal}},
                     )
-                if request.form.get("emmitDate"):
-                    emmit_date = str(request.form.get("emmitDate"))
-                    emmit_formatted = datetime.strptime(
-                        emmit_date, "%Y-%m-%d"
-                    ).strftime("%d-%m-%Y")
-                    current_app.db.products.update_one(
-                        {"_id": _id}, {"$set": {"emmitDate": emmit_formatted}}
+                    if qtdeTotal < product[0].quantidadeCarrinho:
+                        current_app.db.products.update_one(
+                        {"_id": _id},
+                        {"$set": {"quantidadeCarrinho": qtdeTotal}},
                     )
 
                 current_app.db.products.update_one(

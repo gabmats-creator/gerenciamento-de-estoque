@@ -55,19 +55,6 @@
     margin-left: 3px;
 }
 
-.product__delete {
-    display: flex;
-    text-decoration: none;
-    align-items: center;
-    margin-left: 1rem;
-    color: inherit;
-}
-
-.product__delete:hover {
-    text-decoration: underline;
-    color: var(--item-colour);
-}
-
 .button--add {
     position: absolute;
     bottom: 4rem;
