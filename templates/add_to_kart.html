@@ -64,8 +64,7 @@
         </div>
 
         <div class="popup" id="popup">
-            <h2>Deseja excluir esta conta?</h2>
-            <p>Esta ação é definitiva</p>
+            <h2>Deseja excluir este produto do carrinho?</h2>
             <form method="POST">
                 <input type="hidden" name="operacao" value="excluir">
                 <button type="submit">Confirmar</button>
@@ -85,7 +84,7 @@
             {% for product in product_data %}
                 <form method="POST">
                     <label for="productName">Nome do Produto</label>
-                    <input id="productName" type="text" value="{{ product.productName }}" name="productName" placeholder="Novo nome da conta">
+                    <input id="productName" type="text" value="{{ product.productName }}" name="productName" placeholder="Novo nome do produto">
                     <label for="productValue">Valor</label>
                     <input id="productValue" type="number" value="{{ product.productValue }}" name="productValue" placeholder="Novo valor">
                     <label for="emmitDate">Data de inserção</label>
