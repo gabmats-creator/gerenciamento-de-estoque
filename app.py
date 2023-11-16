@@ -86,7 +86,9 @@ def create_app():
         )
         enterprise = Enterprise(**enterprise_data)
         product_data = (
-            current_app.db.products.find({"_id": {"$in": enterprise.products}, "quantidadeTotal": {"$gt": 0}})
+            current_app.db.products.find(
+                {"_id": {"$in": enterprise.products}, "quantidadeTotal": {"$gt": 0}}
+            )
             .sort("insertDate", -1)
             .limit(3)
         )
@@ -378,15 +380,21 @@ def create_app():
                         {"_id": request.args.get("_id")}
                     )
                     if product_data["quantidadeTotal"] > 0:
-                        if product_data["quantidadeTotal"] -1 < product_data["quantidadeCarrinho"]:
+                        if (
+                            product_data["quantidadeTotal"] - 1
+                            < product_data["quantidadeCarrinho"]
+                        ):
                             current_app.db.products.update_one(
-                            {"_id": request.args.get("_id")},
-                            {
-                                "$set": {
-                                    "quantidadeCarrinho": product_data["quantidadeTotal"] -1,
-                                }
-                            },
-                        )
+                                {"_id": request.args.get("_id")},
+                                {
+                                    "$set": {
+                                        "quantidadeCarrinho": product_data[
+                                            "quantidadeTotal"
+                                        ]
+                                        - 1,
+                                    }
+                                },
+                            )
 
                         current_app.db.products.update_one(
                             {"_id": request.args.get("_id")},
