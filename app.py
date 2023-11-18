@@ -38,14 +38,14 @@ def create_app():
         return route_wrapper
 
     def formata_reais(valor):
-        valor_formatado = f"R$ {valor:.2f}"
+        valor_formatado = f"R$ {float(valor):.2f}"
 
         return valor_formatado
 
     def format_today_date():
         return datetime.now().strftime("%d/%m/%Y %H:%M")
 
-    def create_sale(total, products):
+    def create_sale(total, products, client):
         commission = total * 0.07
         user_data = current_app.db.users.find_one({"email": session["email"]})
         user = User(**user_data)
@@ -61,17 +61,18 @@ def create_app():
             total=total,
             employee_id=user._id,
             employee_name=user.name,
-            commission=round(commission),
+            commission=commission,
             number=number,
             enterprise_id=user.enterprise_id,
             products=products,
+            cliente=client,
         )
         current_app.db.sales.insert_one(asdict(sale))
         current_app.db.users.update_one(
             {"_id": user._id},
             {
                 "$set": {
-                    "totalCommission": round(float(user.totalCommission) + commission)
+                    "totalCommission": float(user.totalCommission) + commission
                 }
             },
         )
@@ -115,6 +116,7 @@ def create_app():
         qtdeDispo=None,
         qtdeCarrinho=None,
         sale_kart=None,
+        error=None,
     ):
         user_data = current_app.db.users.find_one({"email": session["email"]})
         user = User(**user_data)
@@ -147,6 +149,7 @@ def create_app():
             qtdeCarrinho=qtdeCarrinho,
             sale_kart=sale_kart,
             confirm_edit=confirm_edit,
+            error=error,
         )
 
     @app.route("/add", methods=["GET", "POST"])
@@ -288,7 +291,7 @@ def create_app():
 
     @app.route("/carrinho", methods=["GET", "POST"])
     @login_required
-    def shopping_kart(delete_kart=None, confirm_edit=None, sale_kart=None):
+    def shopping_kart(delete_kart=None, confirm_edit=None, sale_kart=None, error=None):
         user_data = current_app.db.users.find_one({"email": session["email"]})
         user = User(**user_data)
         enterprise_data = current_app.db.enterprises.find_one(
@@ -310,6 +313,7 @@ def create_app():
             delete_kart=delete_kart,
             confirm_edit=confirm_edit,
             sale_kart=sale_kart,
+            error=error,
         )
 
     @app.route("/carrinho-confirmar/<string:_id>", methods=["GET", "POST"])
@@ -368,6 +372,9 @@ def create_app():
             if request.method == "POST":
                 operacao = request.form.get("operacao")
                 if operacao == "confirmar":
+                    if not request.form.get("client"):
+                        error = "Insira o nome do cliente"
+                        return products(sale_kart=True, error=error)
                     user_data = current_app.db.users.find_one(
                         {"email": session["email"]}
                     )
@@ -406,7 +413,7 @@ def create_app():
                             },
                         )
                         prod_name = "{}({}un.)".format(product_data["productName"], 1)
-                        create_sale(float(product_data["productValue"]), [prod_name])
+                        create_sale(float(product_data["productValue"]), [prod_name], request.form.get("client"))
 
                 return redirect(url_for(".products"))
             return products(sale_kart=True)
@@ -414,6 +421,9 @@ def create_app():
         if request.method == "POST":
             operacao = request.form.get("operacao")
             if operacao == "confirmar":
+                if not request.form.get("client"):
+                    error = "Insira o nome do cliente"
+                    return shopping_kart(sale_kart=True, error=error)
                 user_data = current_app.db.users.find_one({"email": session["email"]})
                 user = User(**user_data)
                 enterprise_data = current_app.db.enterprises.find_one(
@@ -445,7 +455,7 @@ def create_app():
                                 }
                             },
                         )
-                create_sale(total, sale)
+                create_sale(total, sale, request.form["client"])
 
             return redirect(url_for(".shopping_kart"))
 
@@ -510,6 +520,7 @@ def create_app():
                     cnpj=_user.cnpj,
                     admin=False,
                     enterprise_id=_user.enterprise_id,
+                    totalCommission=0,
                     password=pbkdf2_sha256.hash(form.password.data),
                 )
                 current_app.db.users.insert_one(asdict(user))

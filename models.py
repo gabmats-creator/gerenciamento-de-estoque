@@ -52,4 +52,5 @@ class Sale:
     commission: float
     number: int
     enterprise_id: str
+    cliente: str
     products: list[str] = field(default_factory=list)

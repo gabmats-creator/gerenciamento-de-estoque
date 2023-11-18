@@ -20,6 +20,7 @@
             
             <thead>
                 <th class="table__cell table__cell--header">Venda</th>
+                <th class="table__cell table__cell--header">Cliente</th>
                 <th class="table__cell table__cell--header">Produto/quantidade</th>
                 <th class="table__cell table__cell--header">Realizada em</th>
                 <th class="table__cell table__cell--header">Valor total</th>
@@ -33,6 +34,7 @@
                         <td class="table__cell">
                             <p class="table__productname">Venda n°{{ venda.number }}</p>
                         </td>
+                        <td class="table__cell">{{ venda.cliente }}</td>
                         <td class="table__cell">
                             {% for produto in venda.products %}
                                 <p>- {{ produto }}</p>
