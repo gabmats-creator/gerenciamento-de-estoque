@@ -44,6 +44,12 @@ def create_app():
 
     def format_today_date():
         return datetime.now().strftime("%d/%m/%Y %H:%M")
+    
+    def calcula_totvendas(sales):
+        total = 0
+        for sale in sales:
+            total += sale.total
+        return total
 
     def create_sale(total, products, client):
         commission = total * 0.07
@@ -97,6 +103,12 @@ def create_app():
         for produto in product:
             produto.productValue = formata_reais(float(produto.productValue))
 
+        total_vendas = None
+        if user.admin:
+            sale_data = current_app.db.sales.find({"enterprise_id": enterprise._id})
+            sales = [Sale(**sal) for sal in sale_data]
+            total_vendas = formata_reais(calcula_totvendas(sales))
+
         return render_template(
             "index.html",
             title="StockControl - Início",
@@ -104,6 +116,8 @@ def create_app():
             user_name=user.name,
             enterprise=enterprise.enterpriseName,
             cargo=user.admin,
+            total_vendas=total_vendas,
+            commission=formata_reais(user.totalCommission),
         )
 
     @app.route("/produtos", methods=["GET", "POST"])
