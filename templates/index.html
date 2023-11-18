@@ -11,8 +11,14 @@
     <h1>Olá, {{ user_name }}</h1>
     {% if cargo %}
         <p>Você é o gerente da empresa {{ enterprise }}</p>
+        {% if total_qtd %}
+            <p>Sua empresa possui {{ total_qtd }} vendas totalizando {{ total_reais }}</p>
+        {% else %}
+            <p>Sua empresa ainda não possui vendas</p>
+        {% endif %}
     {% else %}
         <p>Você é um funcionário da empresa {{ enterprise }}</p>
+        <p>Seu total de comissões é {{ commission }}</p>
     {% endif %}
     
     <h1>Produtos recentes</h1>

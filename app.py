@@ -17,6 +17,7 @@ from datetime import datetime
 import uuid
 import functools
 import os
+import re
 
 
 def create_app():
@@ -39,11 +40,17 @@ def create_app():
 
     def formata_reais(valor):
         valor_formatado = f"R$ {float(valor):.2f}"
-
-        return valor_formatado
+        return re.sub(re.escape("."), ",", valor_formatado)
 
     def format_today_date():
         return datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    def calcula_totvendas(sales):
+        total = 0
+        for sale in sales:
+            number = sale.number
+            total += sale.total
+        return total, number
 
     def create_sale(total, products, client):
         commission = total * 0.07
@@ -70,11 +77,7 @@ def create_app():
         current_app.db.sales.insert_one(asdict(sale))
         current_app.db.users.update_one(
             {"_id": user._id},
-            {
-                "$set": {
-                    "totalCommission": float(user.totalCommission) + commission
-                }
-            },
+            {"$set": {"totalCommission": float(user.totalCommission) + commission}},
         )
 
     @app.route("/")
@@ -97,6 +100,14 @@ def create_app():
         for produto in product:
             produto.productValue = formata_reais(float(produto.productValue))
 
+        total_reais, total_qtd = 0, 0
+        if user.admin:
+            sale_data = current_app.db.sales.find({"enterprise_id": enterprise._id})
+            sales = [Sale(**sal) for sal in sale_data]
+            if sales:
+                total_reais, total_qtd = calcula_totvendas(sales)
+                total_reais = formata_reais(total_reais)
+
         return render_template(
             "index.html",
             title="StockControl - Início",
@@ -104,6 +115,9 @@ def create_app():
             user_name=user.name,
             enterprise=enterprise.enterpriseName,
             cargo=user.admin,
+            total_reais=total_reais,
+            total_qtd=total_qtd,
+            commission=formata_reais(user.totalCommission),
         )
 
     @app.route("/produtos", methods=["GET", "POST"])
@@ -413,7 +427,11 @@ def create_app():
                             },
                         )
                         prod_name = "{}({}un.)".format(product_data["productName"], 1)
-                        create_sale(float(product_data["productValue"]), [prod_name], request.form.get("client"))
+                        create_sale(
+                            float(product_data["productValue"]),
+                            [prod_name],
+                            request.form.get("client"),
+                        )
 
                 return redirect(url_for(".products"))
             return products(sale_kart=True)
