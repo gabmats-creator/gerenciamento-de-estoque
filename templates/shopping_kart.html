@@ -82,12 +82,15 @@
         </div>
 
         <div class="popup" id="popup">
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
             <h2>Deseja realizar a venda dos produtos do carrinho??</h2>
             <form method="POST">
+                <label for="amount">Nome do cliente</label>
+                <input id="client" type="text" name="client" placeholder="Cliente">
                 <input type="hidden" name="operacao" value="confirmar">
                 <button type="submit">Confirmar</button>
-            </form>
-            <form method="POST">
                 <input type="hidden" name="operacao" value="cancelar">
                 <button type="submit">Cancelar</button>
             </form>
