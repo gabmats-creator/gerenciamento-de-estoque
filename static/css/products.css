@@ -134,11 +134,6 @@ body {
     }
 }
 
-.button--add:hover {
-    color: var(--text);
-    background-color: var(--item-colour);
-}
-
 .overlay {
     display: block;
     position: fixed;
@@ -154,28 +149,35 @@ body {
 .popup {
     display: block;
     position: fixed;
-    background-color: #fff;
-    border: 1px solid #333;
+    background-color: var(--background-color);
+    color: var(--text-dark);
+    border: var(--border-1px);
     border-radius: 5px;
+    width: 95%;
     z-index: 1000;
+    padding: 2.5rem 1.5rem 1.5rem 1.5rem;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 2.5rem 1.5rem 1.5rem 1.5rem;
 }
 
-form {
-    margin: 0 auto;
-    max-width: 30rem;
-    border: var(--border);
-    font-size: 1.2rem;
-
-    background: var(--background-color);
-    box-shadow: 0.75rem 0.75rem 0 -0.2rem goldenrod;
+button {
+    font-weight: bold;
+    color: var(--text-inverted);
+    background-color: var(--background-color-inverted);
+    padding: 10px 20px;
+    border-radius: 5px;
+    width: 15rem;
+    text-align: center;
+    text-decoration: none; 
+    display: inline-block;
+    cursor: pointer; 
 }
-
-.pop {
-    padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+  
+button:hover {
+    color: var(--text-dark);
+    background-color: var(--background-color);
+    border: var(--border-1px);
 }
 
 @media screen and (min-width: 24.75em) {

@@ -3,6 +3,9 @@
 {% extends "layout.html" %}
 
 {% block head_content %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
 {% endblock %}
 
@@ -10,14 +13,6 @@
     <h1>Todos os funcionários</h1>
     {% if employee_data %}
         <table class="table">
-            <colgroup>
-                <col style="width: 20%">
-                <col style="width: 20%">
-                <col style="width: 20%">
-                <col style="width: 20%">
-                <col style="width: 20%">
-            </colgroup>
-            
             <thead>
                 <th class="table__cell table__cell--header">Nome</th>
                 <th class="table__cell table__cell--header">E-mail</th>
@@ -65,44 +60,114 @@
 
     {% if confirm_edit %}
         <div class="overlay" id="overlay"></div>
+        <div class="popup text-center align-middle" id="popup">
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+            <h2>Editar dados</h2>
+            <p>Insira apenas os campos que você deseja alterar</p>
+            <div class="row">
+                {% for bill in bill_data %}
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="billName">Nome da conta</label>
+                                <input id="billName" type="text" value="{{ bill.billName }}" name="billName" placeholder="Novo nome da conta">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="billValue">Valor</label>
+                                <input id="billValue" type="float" value="{{ bill.billValue }}" name="billValue" placeholder="Novo valor">
+                            </div>
+                            {% if bill.expireDate %}
+                                <div class="col-md-4">
+                                    <label for="expireDate">Vencimento</label>
+                                    <input id="expireDate" type="date" value="{{ bill.expireDate }}" name="expireDate" placeholder="Novo vencimento">
+                                </div>
+                            {% endif %}
+                            <div class="col-md-4">
+                                <label for="description">Descrição</label>
+                                <input id="description" type="text" value="{{ bill.description }}" name="description" placeholder="Nova descrição">
+                            </div>
+                        </div>
+                        <div class="row text-center align-middle pt-5">
+                            <div class="col-lg-4 offset-lg-2">
+                                <input type="hidden" name="operacao" value="Confirmar">
+                                <button type="submit">Confirmar</button>
+                            </div>
+                    </form>
+                {% endfor %}
+            </div>
+
+                <div class="col-lg-4">
+                    <form method="POST">
+                        <input type="hidden" name="operacao" value="cancelar">
+                        <button type="submit">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="overlay" id="overlay"></div>
         <div class="popup" id="popup">
             <h2>Editar dados</h2>
-            <p>com essas alterações, o funcionário responsável por esse produto passará a ser você </p>
+            <p>Com essas alterações, o funcionário responsável por esse produto passará a ser você</p>
             {% for employee in employee_data %}
                 <form method="POST">
-                    <label for="name">Nome</label>
-                    <input id="name" type="text" value="{{ employee.name }}" name="name" placeholder="Novo nome do funcionário">
-                    <label for="email">E-mail</label>
-                    <input id="email" type="text" value="{{ employee.email }}" name="email" placeholder="Novo E-mail">
-                    <label for="telefone">Telefone</label>
-                    <input id="telefone" type="text" value="{{ employee.telefone }}" name="telefone" placeholder="Novo telefone">
-                    <input  type="hidden" name="operacao" value="Confirmar">
-                        <button type="submit">Confirmar</button>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="name">Nome</label>
+                            <input id="name" type="text" value="{{ employee.name }}" name="name" placeholder="Novo nome do funcionário">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="email">E-mail</label>
+                            <input id="email" type="text" value="{{ employee.email }}" name="email" placeholder="Novo E-mail">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="telefone">Telefone</label>
+                            <input id="telefone" type="text" value="{{ employee.telefone }}" name="telefone" placeholder="Novo telefone">
+                        </div>
+                    </div>
+                    <div class="row text-center align-middle pt-5">
+                        <div class="col-lg-4 offset-lg-2">
+                            <input type="hidden" name="operacao" value="Confirmar">
+                            <button type="submit">Confirmar</button>
+                        </div>
                 </form>
             {% endfor %}
-            
-            <form method="POST">
-                <input type="hidden" name="operacao" value="cancelar">
-                <button type="submit">Cancelar</button>
-            </form>
+
+                <div class="col-lg-4">
+                    <form method="POST">
+                        <input type="hidden" name="operacao" value="cancelar">
+                        <button type="submit">Cancelar</button>
+                    </form>
+                </div>
+            </div>
         </div>
-    
     {% endif %}
+
     {% if confirm_delete %}
         <div class="overlay" id="overlay"></div>
         </div>
 
         <div class="popup" id="popup">
-            <h2>Deseja excluir este funcionário?</h2>
-            <p>Esta ação é definitiva</p>
-            <form method="POST">
-                <input type="hidden" name="operacao" value="excluir">
-                <button type="submit">Excluir</button>
-            </form>
-            <form method="POST">
-                <input type="hidden" name="operacao" value="cancelar">
-                <button type="submit">Cancelar</button>
-            </form>
+            <div class="row">
+                <h2>Deseja excluir este funcionário?</h2>
+                <p>Esta ação é definitiva</p>
+            </div>
+            <div class="row text-center align-middle">
+                <div class="col-lg-4 offset-lg-2">
+                    <form method="POST">
+                        <input type="hidden" name="operacao" value="excluir">
+                        <button type="submit">Excluir</button>
+                    </form>
+                </div>
+                <div class="col-lg-4">
+                    <form method="POST">
+                        <input type="hidden" name="operacao" value="cancelar">
+                        <button type="submit">Cancelar</button>
+                    </form>
+                </div>
+            </div>
         </div>
     {% endif %}
 
