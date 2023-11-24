@@ -1,8 +1,23 @@
+body {
+    background-color: var(--background-color);
+    color: var(--text-dark);
+}
+
+.header {
+    background-color: var(--background-color);
+}
+
+.container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 .table {
-    max-width: 50rem;
     width: 100%;
     margin: 0 auto;
     border-spacing: 0;
+    color: var(--text-dark);
 }
 
 .table__cell {
@@ -89,7 +104,17 @@
     justify-content: center;
 }
 
+.bill__icon {
+    width: 100%;
+}
 
+.nav__link .bill__icon:hover {
+    color: var(--item-colour);
+}
+
+.nav__link:hover {
+    color: var(--item-colour);
+}
 
 @media screen and (min-width: 50em) {
     .button--add {
@@ -162,5 +187,63 @@ form {
 @media screen and (min-width: 30em) {
     .popup {
         padding-left: 2.5rem;
+    }
+}
+
+/* Small devices (landscape phones, 767.98px and up) */
+@media (max-width: 767.98px) {
+    .col-lg-3 {
+        margin-bottom: 10px; 
+        margin-top: 25px;
+    }
+
+    .popup {
+        width: 75%;
+        justify-content: center;
+        text-align: center;
+    }
+
+    input {
+        width: 100%;
+    }
+    
+    button {
+        padding: 10px 20px;
+        margin: 5px 0;
+        width: 100%;
+		display: flex;
+		justify-content: center;
+    }
+
+    .container {
+        overflow-x: scroll;
+    }
+
+    .col-md-9 {
+        padding-top: 50px;
+    }
+}
+
+/* Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .col-lg-3 {
+        margin-bottom: 10px; 
+        margin-top: 25px;
+    }
+}
+
+/* Large devices (small desktops, 992px and up)*/
+@media (min-width: 992px) and (max-width: 1599.98px) {
+    .col-lg-3 {
+        border-right: 1px solid #ccc; 
+        margin-right: 75px;
+    }
+}
+
+/* Extra large devices (large desktops, 1600px and up)*/
+@media (min-width: 1600px) {
+    .col-lg-3 {
+        border-right: 1px solid #ccc; 
+        margin-right: 75px;
     }
 }
