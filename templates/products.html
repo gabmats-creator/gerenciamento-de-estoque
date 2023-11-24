@@ -4,6 +4,9 @@
 {% extends "layout.html" %}
 
 {% block head_content %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
 {% endblock %}
 
@@ -126,15 +129,21 @@
                     <input id="quantidadeTotal" type="number" value="{{ product.quantidadeTotal }}" name="quantidadeTotal" placeholder="Nova quantidade">
                     <label for="description">Descrição</label>
                     <input id="description" type="text" value="{{ product.description }}" name="description" placeholder="Nova descrição">
-                    <input  type="hidden" name="operacao" value="Confirmar">
-                        <button type="submit">Confirmar</button>
+                    <div class="row text-center align-middle pt-5">
+                        <div class="col-lg-4 offset-lg-2">
+                            <input  type="hidden" name="operacao" value="Confirmar">
+                                <button type="submit">Confirmar</button>
+                        </div>
                 </form>
             {% endfor %}
             
-            <form method="POST">
-                <input type="hidden" name="operacao" value="cancelar">
-                <button type="submit">Cancelar</button>
-            </form>
+                <div class="col-lg-4">
+                    <form method="POST">
+                        <input type="hidden" name="operacao" value="cancelar">
+                        <button type="submit">Cancelar</button>
+                    </form>
+                </div>
+            </div>
         </div>
     
     {% endif %}

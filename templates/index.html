@@ -1,108 +1,114 @@
 {% from "macros/fields.html" import render_text_field %}
+{% from "macros/svgs.html" import plus, list, cart, buy, addperson, allperson, listbuy %}
 
 {% extends "layout.html" %}
 
 {% block head_content %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
 {% endblock %}
 
 {% block main_content %}
-    <h1>Olá, {{ user_name }}</h1>
-    {% if cargo %}
-        <p>Você é o gerente da empresa {{ enterprise }}</p>
-        {% if total_qtd %}
-            <p>Sua empresa possui {{ total_qtd }} vendas totalizando {{ total_reais }}</p>
-        {% else %}
-            <p>Sua empresa ainda não possui vendas</p>
-        {% endif %}
-    {% else %}
-        <p>Você é um funcionário da empresa {{ enterprise }}</p>
-        <p>Seu total de comissões é {{ commission }}</p>
-    {% endif %}
-    
-    <h1>Produtos recentes</h1>
-    {% if product_data %}
-        <table class="table">
-            <colgroup>
-                <col style="width: 20%">
-                <col style="width: 20%">
-                <col style="width: 20%">
-                <col style="width: 20%">
-                <col style="width: 20%">
-            </colgroup>
-            
-            <thead>
-                <th class="table__cell table__cell--header">Nome da Conta</th>
-                <th class="table__cell table__cell--header">Valor</th>
-                <th class="table__cell table__cell--header">Última alteração</th>
-                <th class="table__cell table__cell--header">Descrição</th>
-                <th class="table__cell table__cell--header">Quantidade</th>
-                <th class="table__cell table__cell--header">Funcionário responsável</th>
-                <th class="table__cell table__cell--header"></th>
-            </thead>
-            <tbody>
-                {% for product in product_data %}
-                    <tr>
-                        <td class="table__cell">
-                            <p class="table__productname">{{ product.productName }}</p>
-                        </td>
-                        <td class="table__cell">{{ product.productValue }}</td>
-                        <td class="table__cell">{{ product.insertDate }}</td>
-                        <td class="table__cell">{{ product.description}}</td>
-                        <td class="table__cell">{{ product.quantidadeTotal}}</td>
-                        <td class="table__cell">{{ product.employee_name}}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p class="table__empty">Não há produtos recentes a exibir, <a class="table__link" href="{{ url_for('add_product') }}" >adicione um novo produto</a> para poder visualizá-lo</p>
-    {% endif %}
-    <a
-        href="{{ url_for('add_product') }}" 
-        class="nav__link"
-    >
-        <span class="nav__item">Adicionar novo produto</span>
-    </a>
-    <a
-        href="{{ url_for('products') }}" 
-        class="nav__link"
-    >
-        <span class="nav__item">Todos os produtos</span>
-    </a>
-    <a
-        href="{{ url_for('shopping_kart') }}"
-        class="nav__link"
-    >
-        <span class="nav__item">Acessar carrinho</span>
-    </a>
-    <a
-        href="{{ url_for('your_sales') }}"
-        class="nav__link"
-    >
-        <span class="nav__item">Suas Vendas</span>
-    </a>
-    {% if cargo %}
-        <a
-            href="{{ url_for('new_employee') }}" 
-            class="nav__link"
-        >
-            <span class="nav__item">Adicionar novo funcionário</span>
-        </a>
-        <a
-            href="{{ url_for('employees') }}" 
-            class="nav__link"
-        >
-            <span class="nav__item">Todos os funcionários</span>
-        </a>
-        <a
-            href="{{ url_for('all_sales') }}" 
-            class="nav__link"
-        >
-            <span class="nav__item">Todas as vendas</span>
-        </a>
-    {% endif %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="col">
+                    <a
+                        href="{{ url_for('add_product') }}" 
+                        class="nav__link pt-4 pb-4 bill__icon"
+                    >
+                        <span class="col-3">{{ plus("plus") }}</span><span class="nav__item">Adicionar Produto</span>
+                    </a>
+                    <a
+                        href="{{ url_for('products') }}" 
+                        class="nav__link pb-4 bill__icon"
+                    >
+                        <span class="col-3">{{ list("list") }}</span><span class="nav__item">Todos os Produtos</span>
+                    </a>
+                    <a
+                        href="{{ url_for('shopping_kart') }}"
+                        class="nav__link pb-4 bill__icon"
+                    >
+                        <span class="col-3">{{ cart("cart") }}</span><span class="nav__item">Acessar Carrinho</span>
+                    </a>
+                    <a
+                        href="{{ url_for('your_sales') }}"
+                        class="nav__link pb-4 bill__icon"
+                    >
+                        <span class="col-3">{{ buy("buy") }}</span><span class="nav__item">Suas Vendas</span>
+                    </a>
+                    {% if cargo %}
+                        <a
+                            href="{{ url_for('new_employee') }}" 
+                            class="nav__link pb-4 bill__icon"
+                        >
+                            <span class="col-3">{{ addperson("addperson") }}</span><span class="nav__item">Adicionar novo Funcionário</span>
+                        </a>
+                        <a
+                            href="{{ url_for('employees') }}" 
+                            class="nav__link pb-4 bill__icon" 
+                        >
+                            <span class="col-3">{{ allperson("allperson") }}</span><span class="nav__item">Todos os Funcionários</span>
+                        </a>
+                        <a
+                            href="{{ url_for('all_sales') }}" 
+                            class="nav__link pb-4 bill__icon"
+                        >
+                            <span class="col-3">{{ listbuy("listbuy") }}</span><span class="nav__item">Todas as Vendas</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
 
+            <div class="col-lg-8 p-2">
+                <h1>Olá, {{ user_name }}</h1>
+                {% if cargo %}
+                    <p>Você é o gerente da empresa {{ enterprise }}</p>
+                    {% if total_qtd %}
+                        <p>Sua empresa possui {{ total_qtd }} vendas totalizando {{ total_reais }}</p>
+                    {% else %}
+                        <p>Sua empresa ainda não possui vendas</p>
+                    {% endif %}
+                {% else %}
+                    <p>Você é um funcionário da empresa {{ enterprise }}</p>
+                    <p>Seu total de comissões é {{ commission }}</p>
+                {% endif %}
+                
+                <h1>Produtos recentes</h1>
+                {% if product_data %}
+                    <table class="table">
+                        <thead>
+                            <th class="table__cell table__cell--header">Nome da Conta</th>
+                            <th class="table__cell table__cell--header">Valor</th>
+                            <th class="table__cell table__cell--header">Última alteração</th>
+                            <th class="table__cell table__cell--header">Descrição</th>
+                            <th class="table__cell table__cell--header">Quantidade</th>
+                            <th class="table__cell table__cell--header">Funcionário responsável</th>
+                            <th class="table__cell table__cell--header"></th>
+                        </thead>
+                        <tbody>
+                            {% for product in product_data %}
+                                <tr>
+                                    <td class="table__cell">
+                                        <p class="table__productname">{{ product.productName }}</p>
+                                    </td>
+                                    <td class="table__cell">{{ product.productValue }}</td>
+                                    <td class="table__cell">{{ product.insertDate }}</td>
+                                    <td class="table__cell">{{ product.description}}</td>
+                                    <td class="table__cell">{{ product.quantidadeTotal}}</td>
+                                    <td class="table__cell">{{ product.employee_name}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="table__empty">Não há produtos recentes a exibir, <a class="table__link" href="{{ url_for('add_product') }}" >adicione um novo produto</a> para poder visualizá-lo</p>
+                {% endif %}
+            </div>
+        </div>    
+    </div>
 {% endblock %}
 
