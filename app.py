@@ -151,6 +151,8 @@ def create_app():
                 {"_id": {"$in": enterprise.products}, "quantidadeTotal": 0}
             )
             indisp = [Product(**ind) for ind in indisp_data]
+            for item in indisp:
+                item.productValue = formata_reais(float(item.productValue))
 
         return render_template(
             "products.html",

@@ -27,7 +27,7 @@ class User:
     enterprise_id: str
     totalCommission: float
     password: str
-    products: list[str] = field(default_factory=list)
+    products: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -38,8 +38,8 @@ class Enterprise:
     telefone: str
     cnpj: str
     endereco: str
-    products: list[str] = field(default_factory=list)
-    sales: list[str] = field(default_factory=list)
+    products: List[str] = field(default_factory=list)
+    sales: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -53,4 +53,4 @@ class Sale:
     number: int
     enterprise_id: str
     cliente: str
-    products: list[str] = field(default_factory=list)
+    products: List[str] = field(default_factory=list)
