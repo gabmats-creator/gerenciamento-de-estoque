@@ -18,4 +18,4 @@ Possui todas as permissões que um funcionário, além disso, pode acessar todas
 
 O fluxo básico do sistema inclui cadastrar produtos (se dois produtos de mesmo nome forem inseridos, apenas a quantidade é alterada), registrar a entrada ou a saída de produtos do sistema, controlar vendas, comissões e desempenho profissional (pessoal se for funcionário, todos os funcionários se for gerente).
 
-Para melhor visualização, nosso projeto está disponível em: [StockControl]()
+Para melhor visualização, nosso projeto está disponível em: [StockControl](https://stockcontrol-jwq1.onrender.com)
