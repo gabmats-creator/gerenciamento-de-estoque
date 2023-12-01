@@ -4,6 +4,10 @@
 
 Nosso projeto, desenvolvido para as unidades curriculares de Projeto Interdisciplinar e Desenvolvimento Web, baseia-se em um sistema de controle de estoque, onde funcionários de uma empresa podem cadastrar a entrada e a saída de produtos do sistema.         
 
+## Tecnologias:
+
+Este projeto foi desenvolvido em Python através do framework para web Flask, utilizando o banco de dados MongoDB.
+
 ## Overview:
 ### Cadastro e acesso
 Nosso projeto é abrangente a nível de empresa, no cadastro, o usuário irá informar o CNPJ da empresa da qual ele faz parte, se essa empresa já estiver previamente cadastrada no sistema, o usuário será cadastrado como um funcionário dessa empresa, caso contrário, o usuário precisará cadastrar sua empresa, informando mais alguns dados sobre ela para que o cadastro seja realizado com sucesso, nesse caso o usuário que cadastrou a empresa será o gerente dela.
